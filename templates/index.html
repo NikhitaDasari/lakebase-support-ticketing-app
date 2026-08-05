@@ -1,98 +1,564 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Massive Stock Watchlist</title>
-  <style>
-    body { font-family: -apple-system, Arial, sans-serif; max-width: 560px; margin: 60px auto; color: #222; }
-    h1 { font-size: 20px; }
-    label { display: block; margin-top: 16px; font-weight: 600; }
-    input[type="text"] { width: 100%; padding: 8px; margin-top: 6px; box-sizing: border-box; }
-    button { margin-top: 16px; padding: 8px 16px; cursor: pointer; }
-    #result { margin-top: 20px; white-space: pre-wrap; background: #f6f6f6; padding: 12px; border-radius: 6px; min-height: 20px; }
-    .hint { color: #777; font-size: 13px; margin-top: 4px; }
-    table { width: 100%; margin-top: 24px; border-collapse: collapse; }
-    th, td { text-align: left; padding: 8px; border-bottom: 1px solid #ddd; }
-    th { font-size: 13px; color: #555; text-transform: uppercase; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataExpert Ticketing System</title>
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --secondary: #7c3aed;
+            --accent: #a78bfa;
+
+            --background-start: #eef2ff;
+            --background-end: #f5f3ff;
+
+            --surface: #ffffff;
+            --surface-soft: #f8fafc;
+            --border: #e2e8f0;
+
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 48px 24px;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Oxygen,
+                Ubuntu,
+                Cantarell,
+                sans-serif;
+
+            color: var(--text-primary);
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(129, 140, 248, 0.22),
+                    transparent 36%
+                ),
+                radial-gradient(
+                    circle at bottom right,
+                    rgba(192, 132, 252, 0.20),
+                    transparent 34%
+                ),
+                linear-gradient(
+                    135deg,
+                    var(--background-start) 0%,
+                    var(--background-end) 100%
+                );
+        }
+
+        .page-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .container {
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 22px;
+            box-shadow:
+                0 24px 60px rgba(79, 70, 229, 0.15),
+                0 8px 24px rgba(15, 23, 42, 0.08);
+            backdrop-filter: blur(12px);
+        }
+
+        .header {
+            position: relative;
+            overflow: hidden;
+            padding: 44px 48px;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(255, 255, 255, 0.22),
+                    transparent 34%
+                ),
+                linear-gradient(
+                    135deg,
+                    #3730a3 0%,
+                    #4f46e5 45%,
+                    #7c3aed 100%
+                );
+
+            color: white;
+        }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            top: -120px;
+            right: 120px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .header::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            right: -60px;
+            bottom: -100px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .header-row {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 32px;
+        }
+
+        .brand-block {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .brand-icon {
+            display: grid;
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
+            place-items: center;
+
+            font-size: 31px;
+
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            border-radius: 18px;
+            box-shadow: 0 12px 28px rgba(30, 27, 75, 0.22);
+            backdrop-filter: blur(8px);
+        }
+
+        .platform-label {
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: #ddd6fe;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(30px, 4vw, 44px);
+            line-height: 1.1;
+            font-weight: 800;
+            letter-spacing: -1.2px;
+        }
+
+        .header-description {
+            max-width: 640px;
+            margin-top: 10px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.82);
+        }
+
+        .btn-create {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            flex-shrink: 0;
+
+            padding: 13px 22px;
+
+            color: var(--primary-dark);
+            background: white;
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            border-radius: 11px;
+
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+
+            box-shadow: 0 10px 24px rgba(30, 27, 75, 0.22);
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .btn-create .plus {
+            font-size: 21px;
+            line-height: 1;
+        }
+
+        .btn-create:hover {
+            transform: translateY(-2px);
+            background: #fafafa;
+            box-shadow: 0 14px 30px rgba(30, 27, 75, 0.28);
+        }
+
+        .content-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 24px 32px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .content-heading h2 {
+            font-size: 19px;
+            font-weight: 750;
+            color: var(--text-primary);
+        }
+
+        .ticket-count {
+            padding: 6px 11px;
+            color: var(--primary-dark);
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            background: var(--surface);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 15px 24px;
+            text-align: left;
+
+            color: var(--text-secondary);
+            background: var(--surface-soft);
+            border-bottom: 1px solid var(--border);
+
+            font-size: 12px;
+            font-weight: 750;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 20px 24px;
+            color: var(--text-primary);
+            border-bottom: 1px solid #eef2f7;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        tbody tr {
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: #fafaff;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .ticket-id {
+            color: var(--text-muted);
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 13px;
+            font-weight: 650;
+        }
+
+        .ticket-link {
+            color: #4338ca;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .ticket-link:hover {
+            color: #7c3aed;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        .created-by {
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .created-at {
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 6px 11px;
+            border: 1px solid transparent;
+            border-radius: 999px;
+
+            font-size: 12px;
+            font-weight: 750;
+            text-transform: capitalize;
+            white-space: nowrap;
+        }
+
+        .status::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .status-open {
+            color: #1d4ed8;
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .status-in-progress {
+            color: #b45309;
+            background: #fffbeb;
+            border-color: #fde68a;
+        }
+
+        .status-resolved,
+        .status-closed {
+            color: #047857;
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+        }
+
+        .empty-state {
+            padding: 90px 24px;
+            text-align: center;
+            color: var(--text-secondary);
+            background: var(--surface);
+        }
+
+        .empty-icon {
+            display: grid;
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 20px;
+            place-items: center;
+
+            font-size: 34px;
+
+            color: var(--primary);
+            background: #eef2ff;
+            border-radius: 20px;
+        }
+
+        .empty-state h2 {
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-size: 22px;
+        }
+
+        .empty-state p {
+            margin-bottom: 24px;
+            font-size: 15px;
+        }
+
+        .empty-state .btn-create {
+            color: white;
+            background: linear-gradient(
+                135deg,
+                var(--primary) 0%,
+                var(--secondary) 100%
+            );
+            border: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 12px;
+            }
+
+            .container {
+                border-radius: 16px;
+            }
+
+            .header {
+                padding: 30px 24px;
+            }
+
+            .header-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .brand-block {
+                align-items: flex-start;
+            }
+
+            .brand-icon {
+                width: 54px;
+                height: 54px;
+                font-size: 26px;
+                border-radius: 15px;
+            }
+
+            .btn-create {
+                width: 100%;
+            }
+
+            .content-heading {
+                padding: 20px;
+            }
+
+            th,
+            td {
+                padding: 14px 16px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-  <h1>Stock Watchlist</h1>
-  <p class="hint">Enter a single ticker symbol. This sends exactly ONE call to the Massive API to fetch the latest price, then adds it to your watchlist.</p>
+    <main class="page-wrapper">
+        <div class="container">
+            <header class="header">
+                <div class="header-row">
+                    <div class="brand-block">
+                        <div class="brand-icon">🎫</div>
 
-  <form id="stock-form">
-    <label for="symbol">Ticker symbol</label>
-    <input type="text" id="symbol" name="symbol" placeholder="AAPL" required>
-    <button type="submit">Add to watchlist</button>
-  </form>
+                        <div>
+                            <div class="platform-label">
+                                Internal Support Platform
+                            </div>
 
-  <div id="result"></div>
+                            <h1>DataExpert Ticketing System</h1>
 
-  <table id="watchlist-table">
-    <thead>
-      <tr>
-        <th>Symbol</th>
-        <th>Email</th>
-        <th>Latest price</th>
-        <th>Updated</th>
-      </tr>
-    </thead>
-    <tbody id="watchlist-body"></tbody>
-  </table>
+                            <p class="header-description">
+                                Create, track, and manage internal support
+                                requests from one centralized workspace.
+                            </p>
+                        </div>
+                    </div>
 
-  <script>
-    const form = document.getElementById("stock-form");
-    const resultEl = document.getElementById("result");
-    const watchlistBody = document.getElementById("watchlist-body");
+                    <a href="{{ url_for('create_ticket') }}" class="btn-create">
+                        <span class="plus">+</span>
+                        Create Ticket
+                    </a>
+                </div>
+            </header>
 
-    async function loadWatchlist() {
-      try {
-        const resp = await fetch("/watchlist");
-        const data = await resp.json();
-        if (!resp.ok) {
-          resultEl.textContent = "Error loading watchlist: " + (data.error || resp.statusText);
-          return;
-        }
-        watchlistBody.innerHTML = "";
-        data.forEach((row) => {
-          const tr = document.createElement("tr");
-          const price = row.latest_price !== null && row.latest_price !== undefined
-            ? Number(row.latest_price).toFixed(2)
-            : "-";
-          const updated = row.updated_at ? new Date(row.updated_at).toLocaleString() : "-";
-          tr.innerHTML = `<td>${row.symbol}</td><td>${row.email || "-"}</td><td>${price}</td><td>${updated}</td>`;
-          watchlistBody.appendChild(tr);
-        });
-      } catch (err) {
-        resultEl.textContent = "Failed to load watchlist: " + err;
-      }
-    }
+            <section class="content-heading">
+                <h2>Support Tickets</h2>
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const symbol = document.getElementById("symbol").value;
-      resultEl.textContent = "Adding to watchlist...";
+                {% if tickets %}
+                <span class="ticket-count">
+                    {{ tickets|length }}
+                    {{ "ticket" if tickets|length == 1 else "tickets" }}
+                </span>
+                {% endif %}
+            </section>
 
-      try {
-        const resp = await fetch("/watchlist", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ symbol }),
-        });
-        const data = await resp.json();
-        if (!resp.ok) {
-          resultEl.textContent = "Error: " + (data.error || resp.statusText);
-          return;
-        }
-        resultEl.textContent = "Added " + data.symbol + " at price " + data.latest_price;
-        document.getElementById("symbol").value = "";
-        loadWatchlist();
-      } catch (err) {
-        resultEl.textContent = "Request failed: " + err;
-      }
-    });
+            <div class="table-container">
+                {% if tickets %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Ticket Title</th>
+                            <th>Status</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
+                        </tr>
+                    </thead>
 
-    loadWatchlist();
-  </script>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr>
+                            <td class="ticket-id">
+                                #{{ ticket.ticket_id }}
+                            </td>
+
+                            <td>
+                                <a
+                                    href="{{ url_for('ticket_details', ticket_id=ticket.ticket_id) }}"
+                                    class="ticket-link"
+                                >
+                                    {{ ticket.title }}
+                                </a>
+                            </td>
+
+                            <td>
+                                <span
+                                    class="status status-{{ ticket.status.replace('_', '-') }}"
+                                >
+                                    {{ ticket.status.replace("_", " ") }}
+                                </span>
+                            </td>
+
+                            <td class="created-by">
+                                {{ ticket.created_by }}
+                            </td>
+
+                            <td class="created-at">
+                                {{ ticket.created_at.strftime('%b %d, %Y · %I:%M %p') if ticket.created_at else "" }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">🎫</div>
+
+                    <h2>No tickets yet</h2>
+
+                    <p>
+                        Create your first support ticket to get started.
+                    </p>
+
+                    <a
+                        href="{{ url_for('create_ticket') }}"
+                        class="btn-create"
+                    >
+                        <span class="plus">+</span>
+                        Create Ticket
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
 </body>
 </html>
+

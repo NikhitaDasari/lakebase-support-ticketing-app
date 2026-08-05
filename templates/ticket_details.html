@@ -1,0 +1,809 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ ticket.title }} | DataExpert Ticketing System</title>
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --secondary: #7c3aed;
+
+            --background-start: #eef2ff;
+            --background-end: #f5f3ff;
+
+            --surface: #ffffff;
+            --surface-soft: #f8fafc;
+            --border: #e2e8f0;
+
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 48px 24px;
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Oxygen,
+                Ubuntu,
+                Cantarell,
+                sans-serif;
+
+            color: var(--text-primary);
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(129, 140, 248, 0.22),
+                    transparent 36%
+                ),
+                radial-gradient(
+                    circle at bottom right,
+                    rgba(192, 132, 252, 0.20),
+                    transparent 34%
+                ),
+                linear-gradient(
+                    135deg,
+                    var(--background-start) 0%,
+                    var(--background-end) 100%
+                );
+        }
+
+        .page-wrapper {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            margin-bottom: 20px;
+
+            color: #4338ca;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+
+            transition:
+                gap 0.2s ease,
+                color 0.2s ease;
+        }
+
+        .back-link:hover {
+            gap: 12px;
+            color: #7c3aed;
+        }
+
+        .page-card {
+            overflow: hidden;
+
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 22px;
+
+            box-shadow:
+                0 24px 60px rgba(79, 70, 229, 0.15),
+                0 8px 24px rgba(15, 23, 42, 0.08);
+
+            backdrop-filter: blur(12px);
+        }
+
+        .header {
+            position: relative;
+            overflow: hidden;
+            padding: 36px 40px;
+
+            color: white;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(255, 255, 255, 0.22),
+                    transparent 34%
+                ),
+                linear-gradient(
+                    135deg,
+                    #3730a3 0%,
+                    #4f46e5 45%,
+                    #7c3aed 100%
+                );
+        }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -95px;
+            right: 90px;
+
+            width: 190px;
+            height: 190px;
+
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .header::after {
+            content: "";
+            position: absolute;
+            right: -50px;
+            bottom: -95px;
+
+            width: 170px;
+            height: 170px;
+
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .brand-block {
+            position: relative;
+            z-index: 1;
+
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .brand-icon {
+            display: grid;
+            width: 58px;
+            height: 58px;
+            flex-shrink: 0;
+            place-items: center;
+
+            font-size: 28px;
+
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            border-radius: 17px;
+
+            box-shadow: 0 12px 28px rgba(30, 27, 75, 0.22);
+            backdrop-filter: blur(8px);
+        }
+
+        .platform-label {
+            margin-bottom: 5px;
+
+            color: #ddd6fe;
+            font-size: 12px;
+            font-weight: 750;
+            letter-spacing: 1.7px;
+            text-transform: uppercase;
+        }
+
+        .system-title {
+            margin: 0;
+
+            font-size: clamp(26px, 4vw, 36px);
+            line-height: 1.12;
+            font-weight: 800;
+            letter-spacing: -0.9px;
+        }
+
+        .header-description {
+            margin-top: 8px;
+
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 14px;
+            line-height: 1.55;
+        }
+
+        .content {
+            padding: 36px 40px 42px;
+        }
+
+        .ticket-summary {
+            margin-bottom: 28px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ticket-label {
+            margin-bottom: 8px;
+
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+        }
+
+        .ticket-title {
+            margin-bottom: 18px;
+
+            color: var(--text-primary);
+            font-size: clamp(28px, 4vw, 38px);
+            line-height: 1.2;
+            font-weight: 800;
+            letter-spacing: -0.7px;
+        }
+
+        .ticket-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 18px;
+        }
+
+        .ticket-meta {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 6px 11px;
+
+            border: 1px solid transparent;
+            border-radius: 999px;
+
+            font-size: 12px;
+            font-weight: 750;
+            text-transform: capitalize;
+            white-space: nowrap;
+        }
+
+        .status::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .status-open {
+            color: #1d4ed8;
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .status-in-progress {
+            color: #b45309;
+            background: #fffbeb;
+            border-color: #fde68a;
+        }
+
+        .status-resolved,
+        .status-closed {
+            color: #047857;
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+        }
+
+        .section-card {
+            margin-bottom: 24px;
+            padding: 24px;
+
+            background: var(--surface-soft);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            margin-bottom: 18px;
+        }
+
+        .section-icon {
+            display: grid;
+            width: 34px;
+            height: 34px;
+            place-items: center;
+
+            background: #eef2ff;
+            border-radius: 10px;
+
+            font-size: 17px;
+        }
+
+        .section-heading h2,
+        .section-heading h3 {
+            color: var(--text-primary);
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .inline-form {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+        }
+
+        .inline-form .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+
+            color: #334155;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        textarea,
+        select {
+            width: 100%;
+            padding: 13px 15px;
+
+            color: var(--text-primary);
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+
+            font-family: inherit;
+            font-size: 15px;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        textarea {
+            min-height: 130px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        textarea:hover,
+        select:hover {
+            border-color: #c7d2fe;
+        }
+
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+        }
+
+        .btn-submit {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+
+            min-height: 46px;
+            padding: 12px 22px;
+
+            color: white;
+            background: linear-gradient(
+                135deg,
+                var(--primary) 0%,
+                var(--secondary) 100%
+            );
+
+            border: none;
+            border-radius: 10px;
+
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 750;
+            cursor: pointer;
+
+            box-shadow: 0 8px 18px rgba(79, 70, 229, 0.28);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(79, 70, 229, 0.34);
+        }
+
+        .btn-danger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+
+            min-height: 46px;
+            padding: 12px 22px;
+
+            color: white;
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            border-radius: 10px;
+
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 750;
+            cursor: pointer;
+
+            box-shadow: 0 8px 18px rgba(220, 38, 38, 0.3);
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(220, 38, 38, 0.4);
+        }
+
+        .danger-section {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        .danger-section .section-icon {
+            background: #fee2e2;
+        }
+
+        .messages-section {
+            margin-bottom: 24px;
+        }
+
+        .messages-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+
+            margin-bottom: 16px;
+        }
+
+        .messages-heading h2 {
+            color: var(--text-primary);
+            font-size: 21px;
+            font-weight: 800;
+        }
+
+        .message-count {
+            padding: 6px 11px;
+
+            color: var(--primary-dark);
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 999px;
+
+            font-size: 12px;
+            font-weight: 750;
+        }
+
+        .message-card {
+            position: relative;
+
+            margin-bottom: 14px;
+            padding: 20px 22px 18px 25px;
+
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+
+            box-shadow: 0 5px 16px rgba(15, 23, 42, 0.05);
+        }
+
+        .message-card::before {
+            content: "";
+            position: absolute;
+            top: 16px;
+            bottom: 16px;
+            left: 0;
+
+            width: 4px;
+
+            background: linear-gradient(
+                180deg,
+                var(--primary) 0%,
+                var(--secondary) 100%
+            );
+
+            border-radius: 0 4px 4px 0;
+        }
+
+        .message-text {
+            margin-bottom: 13px;
+
+            color: #334155;
+            font-size: 15px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            text-align: left;
+        }
+
+        .message-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 7px;
+
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .message-author {
+            color: #475569;
+            font-weight: 750;
+        }
+
+        .empty-messages {
+            padding: 44px 24px;
+
+            color: var(--text-secondary);
+            background: white;
+            border: 1px dashed #cbd5e1;
+            border-radius: 13px;
+
+            text-align: center;
+        }
+
+        .empty-icon {
+            margin-bottom: 10px;
+            font-size: 30px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 12px;
+            }
+
+            .page-card {
+                border-radius: 16px;
+            }
+
+            .header {
+                padding: 28px 22px;
+            }
+
+            .brand-block {
+                align-items: flex-start;
+            }
+
+            .brand-icon {
+                width: 52px;
+                height: 52px;
+
+                font-size: 25px;
+                border-radius: 15px;
+            }
+
+            .content {
+                padding: 28px 22px 30px;
+            }
+
+            .inline-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .inline-form .form-group {
+                width: 100%;
+            }
+
+            .btn-submit {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page-wrapper">
+        <a class="back-link" href="{{ url_for('index') }}">
+            ← Back to all tickets
+        </a>
+
+        <div class="page-card">
+            <header class="header">
+                <div class="brand-block">
+                    <div class="brand-icon">🎫</div>
+
+                    <div>
+                        <div class="platform-label">
+                            Internal Support Platform
+                        </div>
+
+                        <h1 class="system-title">
+                            DataExpert Ticketing System
+                        </h1>
+
+                        <p class="header-description">
+                            Review the ticket conversation and manage its status.
+                        </p>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content">
+                <section class="ticket-summary">
+                    <div class="ticket-label">
+                        Ticket #{{ ticket.ticket_id }}
+                    </div>
+
+                    <h2 class="ticket-title">
+                        {{ ticket.title }}
+                    </h2>
+
+                    <div class="ticket-meta-row">
+                        <span
+                            class="status status-{{ ticket.status.replace('_', '-') }}"
+                        >
+                            {{ ticket.status.replace("_", " ") }}
+                        </span>
+
+                        <span class="ticket-meta">
+                            <strong>Created by</strong>
+                            {{ ticket.created_by }}
+                        </span>
+
+                        <span class="ticket-meta">
+                            <strong>Created</strong>
+                            {{ ticket.created_at.strftime('%b %d, %Y · %I:%M %p') if ticket.created_at else "" }}
+                        </span>
+                    </div>
+                </section>
+
+                <section class="section-card">
+                    <div class="section-heading">
+                        <span class="section-icon">⚙️</span>
+                        <h3>Update Status</h3>
+                    </div>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('update_status', ticket_id=ticket.ticket_id) }}"
+                        class="inline-form"
+                    >
+                        <div class="form-group">
+                            <label for="status">Ticket Status</label>
+
+                            <select id="status" name="status" required>
+                                <option
+                                    value="open"
+                                    {% if ticket.status == 'open' %}selected{% endif %}
+                                >
+                                    Open
+                                </option>
+
+                                <option
+                                    value="in_progress"
+                                    {% if ticket.status == 'in_progress' %}selected{% endif %}
+                                >
+                                    In Progress
+                                </option>
+
+                                <option
+                                    value="resolved"
+                                    {% if ticket.status == 'resolved' %}selected{% endif %}
+                                >
+                                    Resolved
+                                </option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            Update Status
+                        </button>
+                    </form>
+                </section>
+
+                <section class="messages-section">
+                    <div class="messages-heading">
+                        <h2>💬 Messages</h2>
+
+                        {% if messages %}
+                        <span class="message-count">
+                            {{ messages|length }}
+                            {{ "message" if messages|length == 1 else "messages" }}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                        <article class="message-card">
+                            <p class="message-text">
+                                {{ message.message_text }}
+                            </p>
+
+                            <div class="message-meta">
+                                <span class="message-author">
+                                    {{ message.author }}
+                                </span>
+
+                                <span>·</span>
+
+                                <span>
+                                    {{ message.created_at.strftime('%b %d, %Y · %I:%M %p') if message.created_at else "" }}
+                                </span>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-messages">
+                            <div class="empty-icon">💬</div>
+                            <p>No messages have been added to this ticket yet.</p>
+                        </div>
+                    {% endif %}
+                </section>
+
+                <section class="section-card">
+                    <div class="section-heading">
+                        <span class="section-icon">✏️</span>
+                        <h3>Add a Message</h3>
+                    </div>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('add_message', ticket_id=ticket.ticket_id) }}"
+                    >
+                        <div class="form-group">
+                            <label for="message_text">
+                                Your Message
+                            </label>
+
+                            <textarea
+                                id="message_text"
+                                name="message_text"
+                                required
+                                maxlength="3000"
+                                placeholder="Type your message here..."
+                            ></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            Send Message
+                        </button>
+                    </form>
+                </section>
+
+                <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center;">
+                    <form
+                        method="POST"
+                        action="{{ url_for('delete_ticket', ticket_id=ticket.ticket_id) }}"
+                        onsubmit="return confirm('Are you sure you want to delete this ticket? This action cannot be undone.');"
+                        style="display: inline;"
+                    >
+                        <button type="submit" class="btn-danger">
+                            🗑️ Delete Ticket
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
+

@@ -1,0 +1,497 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Ticket | DataExpert Ticketing System</title>
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --secondary: #7c3aed;
+
+            --background-start: #eef2ff;
+            --background-end: #f5f3ff;
+
+            --surface: #ffffff;
+            --surface-soft: #f8fafc;
+            --border: #e2e8f0;
+
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 48px 24px;
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Oxygen,
+                Ubuntu,
+                Cantarell,
+                sans-serif;
+
+            color: var(--text-primary);
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(129, 140, 248, 0.22),
+                    transparent 36%
+                ),
+                radial-gradient(
+                    circle at bottom right,
+                    rgba(192, 132, 252, 0.20),
+                    transparent 34%
+                ),
+                linear-gradient(
+                    135deg,
+                    var(--background-start) 0%,
+                    var(--background-end) 100%
+                );
+        }
+
+        .page-wrapper {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            margin-bottom: 20px;
+
+            color: #4338ca;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+
+            transition:
+                gap 0.2s ease,
+                color 0.2s ease;
+        }
+
+        .back-link:hover {
+            gap: 12px;
+            color: #7c3aed;
+        }
+
+        .container {
+            overflow: hidden;
+
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 22px;
+
+            box-shadow:
+                0 24px 60px rgba(79, 70, 229, 0.15),
+                0 8px 24px rgba(15, 23, 42, 0.08);
+
+            backdrop-filter: blur(12px);
+        }
+
+        .header {
+            position: relative;
+            overflow: hidden;
+            padding: 36px 40px;
+
+            color: white;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(255, 255, 255, 0.22),
+                    transparent 34%
+                ),
+                linear-gradient(
+                    135deg,
+                    #3730a3 0%,
+                    #4f46e5 45%,
+                    #7c3aed 100%
+                );
+        }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -95px;
+            right: 80px;
+
+            width: 190px;
+            height: 190px;
+
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .header::after {
+            content: "";
+            position: absolute;
+            right: -55px;
+            bottom: -95px;
+
+            width: 170px;
+            height: 170px;
+
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .brand-block {
+            position: relative;
+            z-index: 1;
+
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .brand-icon {
+            display: grid;
+            width: 58px;
+            height: 58px;
+            flex-shrink: 0;
+            place-items: center;
+
+            font-size: 28px;
+
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            border-radius: 17px;
+
+            box-shadow: 0 12px 28px rgba(30, 27, 75, 0.22);
+            backdrop-filter: blur(8px);
+        }
+
+        .platform-label {
+            margin-bottom: 5px;
+
+            color: #ddd6fe;
+            font-size: 12px;
+            font-weight: 750;
+            letter-spacing: 1.7px;
+            text-transform: uppercase;
+        }
+
+        .system-title {
+            margin: 0;
+
+            font-size: clamp(26px, 4vw, 36px);
+            line-height: 1.12;
+            font-weight: 800;
+            letter-spacing: -0.9px;
+        }
+
+        .header-description {
+            margin-top: 8px;
+
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 14px;
+            line-height: 1.55;
+        }
+
+        .form-content {
+            padding: 38px 40px 42px;
+        }
+
+        .form-heading {
+            margin-bottom: 30px;
+        }
+
+        .form-heading h2 {
+            margin-bottom: 7px;
+
+            color: var(--text-primary);
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+        }
+
+        .form-heading p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+
+            color: #334155;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 13px 15px;
+
+            color: var(--text-primary);
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+
+            font-family: inherit;
+            font-size: 15px;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--text-muted);
+        }
+
+        input[type="text"]:hover,
+        select:hover {
+            border-color: #c7d2fe;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+        }
+
+        .field-help {
+            margin-top: 7px;
+
+            color: var(--text-secondary);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .button-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            margin-top: 34px;
+            padding-top: 26px;
+
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+
+            min-height: 46px;
+            padding: 12px 22px;
+
+            border: none;
+            border-radius: 10px;
+
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 750;
+            text-decoration: none;
+            cursor: pointer;
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+        .btn-primary {
+            color: white;
+
+            background: linear-gradient(
+                135deg,
+                var(--primary) 0%,
+                var(--secondary) 100%
+            );
+
+            box-shadow: 0 8px 18px rgba(79, 70, 229, 0.28);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(79, 70, 229, 0.34);
+        }
+
+        .btn-secondary {
+            color: #475569;
+            background: var(--surface-soft);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            color: var(--primary-dark);
+            background: #eef2ff;
+            border-color: #c7d2fe;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 12px;
+            }
+
+            .container {
+                border-radius: 16px;
+            }
+
+            .header {
+                padding: 28px 22px;
+            }
+
+            .brand-block {
+                align-items: flex-start;
+            }
+
+            .brand-icon {
+                width: 52px;
+                height: 52px;
+
+                font-size: 25px;
+                border-radius: 15px;
+            }
+
+            .form-content {
+                padding: 28px 22px 30px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page-wrapper">
+        <a class="back-link" href="{{ url_for('index') }}">
+            ← Back to all tickets
+        </a>
+
+        <div class="container">
+            <header class="header">
+                <div class="brand-block">
+                    <div class="brand-icon">🎫</div>
+
+                    <div>
+                        <div class="platform-label">
+                            Internal Support Platform
+                        </div>
+
+                        <h1 class="system-title">
+                            DataExpert Ticketing System
+                        </h1>
+
+                        <p class="header-description">
+                            Create and manage internal support requests
+                            from one centralized workspace.
+                        </p>
+                    </div>
+                </div>
+            </header>
+
+            <section class="form-content">
+                <div class="form-heading">
+                    <h2>Create New Ticket</h2>
+
+                    <p>
+                        Enter the support request details below.
+                        You can add messages after the ticket is created.
+                    </p>
+                </div>
+
+                <form
+                    method="POST"
+                    action="{{ url_for('create_ticket') }}"
+                >
+                    <div class="form-group">
+                        <label for="title">
+                            Ticket Title
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            required
+                            maxlength="200"
+                            autocomplete="off"
+                            placeholder="Briefly describe the issue"
+                        >
+
+                        <p class="field-help">
+                            Use a clear title that summarizes the support request.
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">
+                            Status
+                            <span class="required">*</span>
+                        </label>
+
+                        <select id="status" name="status" required>
+                            <option value="open">Open</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="resolved">Resolved</option>
+                        </select>
+
+                        <p class="field-help">
+                            New tickets will usually begin with an Open status.
+                        </p>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">
+                            <span>＋</span>
+                            Create Ticket
+                        </button>
+
+                        <a
+                            href="{{ url_for('index') }}"
+                            class="btn btn-secondary"
+                        >
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+</body>
+</html>
+
